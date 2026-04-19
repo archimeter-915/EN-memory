@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>溪郎故陶 · 英文練習</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#F5F0E8;--card:#FDFAF4;--text:#2A2520;--muted:#8A7F72;--green:#2D6A4F;--gbg:#D8F3DC;--red:#B5341A;--rbg:#FDEAE5;--amber:#D97706;--abg:#FEF3C7;--accent:#C96B3A;--border:#E2D9CC;--gold:#F59E0B;--gold-bg:#FFFBEB}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100dvh;padding-bottom:48px}
+
+/* ── Header ── */
+.header{background:linear-gradient(135deg,#1B4332 0%,#2D6A4F 100%);padding:22px 20px 18px;text-align:center;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-30px;right:-30px;width:110px;height:110px;background:rgba(255,255,255,.05);border-radius:50%}
+.header h1{font-family:'Lora',serif;font-size:1.25rem;color:rgba(255,255,255,.95);position:relative}
+.header .sub{font-size:.72rem;color:rgba(255,255,255,.55);margin-top:5px;letter-spacing:.05em;position:relative}
+.header .credit{position:absolute;bottom:8px;right:14px;font-size:.6rem;color:rgba(255,255,255,.32);letter-spacing:.04em}
+
+/* ── Screens ── */
+.screen{display:none;padding:16px}
+.screen.active{display:block}
+.card{background:var(--card);border-radius:18px;padding:18px;margin-bottom:14px;border:1px solid var(--border);box-shadow:0 2px 12px rgba(42,37,32,.07)}
+.lbl{font-size:.67rem;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+
+/* ── Name grid ── */
+.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.name-btn{background:var(--bg);border:2px solid var(--border);border-radius:13px;padding:13px 8px;font-family:'Noto Sans TC',sans-serif;font-size:.95rem;font-weight:500;color:var(--text);cursor:pointer;text-align:center;transition:all .15s;position:relative}
+.name-btn.sel{background:var(--green);border-color:var(--green);color:#fff}
+.name-btn.sel::after{content:'✓';position:absolute;top:5px;right:8px;font-size:.65rem}
+
+/* ── Script tabs ── */
+.tab-row{display:flex;gap:8px;margin-bottom:12px}
+.tab-btn{flex:1;padding:10px;border-radius:12px;border:2px solid var(--border);background:var(--bg);font-family:'Noto Sans TC',sans-serif;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;text-align:center;transition:all .15s;line-height:1.4}
+.tab-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── Mode buttons ── */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.mode-btn{border-radius:16px;padding:18px 10px;border:2px solid var(--border);background:var(--bg);font-family:'Noto Sans TC',sans-serif;cursor:pointer;text-align:center;transition:all .18s}
+.mode-btn:active{transform:scale(.97)}
+.mode-btn .ico{font-size:1.9rem;display:block;margin-bottom:8px}
+.mode-btn .mtitle{font-size:.9rem;font-weight:700;color:var(--text)}
+.mode-btn .msub{font-size:.7rem;color:var(--muted);margin-top:3px;line-height:1.4}
+.mode-btn.read-mode{border-color:var(--green);background:#f0faf4}
+.mode-btn.memo-mode{border-color:var(--gold);background:var(--gold-bg)}
+
+/* ── Script display ── */
+.script-text{font-family:'Lora',serif;font-size:1rem;line-height:2.2;word-spacing:3px}
+.word{display:inline;border-radius:3px;padding:1px 2px;transition:background .2s,color .2s}
+.word.hit{background:var(--gbg);color:var(--green);font-weight:600}
+.word.miss{background:var(--rbg);color:var(--red);text-decoration:underline wavy var(--red);cursor:pointer}
+.word.miss:active{opacity:.7}
+
+/* ── Memo mode: blank area ── */
+.memo-zone{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px dashed var(--gold);border-radius:18px;padding:28px 20px;text-align:center;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.memo-zone .mico{font-size:2.4rem}
+.memo-zone .mtxt{font-size:.9rem;color:var(--amber);font-weight:700}
+.memo-zone .msub2{font-size:.75rem;color:var(--amber);opacity:.75;line-height:1.5}
+
+/* ── Score ── */
+.score-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.score-big{font-family:'Lora',serif;font-size:2.5rem;font-weight:600;line-height:1}
+.track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,#52B788,#2D6A4F);border-radius:4px;transition:width .4s;min-width:0}
+
+/* ── Transcript ── */
+.txbox{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:13px;min-height:52px;font-size:.84rem;color:var(--muted);line-height:1.7;font-style:italic;transition:border-color .2s}
+.txbox.live{border-color:var(--accent);color:var(--text);font-style:normal}
+
+/* ── Mic ── */
+.mic-area{display:flex;flex-direction:column;align-items:center;padding:18px 0 6px;gap:12px}
+.mic-btn{width:78px;height:78px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mic-btn.read-mic{background:var(--accent);box-shadow:0 6px 22px rgba(201,107,58,.35)}
+.mic-btn.memo-mic{background:var(--gold);box-shadow:0 6px 22px rgba(245,158,11,.35)}
+.mic-btn.on{animation:pulse 1.4s ease-in-out infinite}
+.mic-btn.read-mic.on{background:var(--red);box-shadow:0 6px 22px rgba(181,52,26,.4)}
+.mic-btn.memo-mic.on{background:#D97706;box-shadow:0 6px 22px rgba(217,119,6,.4)}
+@keyframes pulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(181,52,26,.4)}50%{transform:scale(1.04);box-shadow:0 0 0 14px rgba(181,52,26,0)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(181,52,26,0)}}
+.mic-btn svg{width:32px;height:32px;fill:#fff}
+.mic-lbl{font-size:.8rem;color:var(--muted);text-align:center;font-weight:500}
+.mic-lbl span{display:block;font-size:.7rem;margin-top:2px;opacity:.7}
+
+/* ── Buttons ── */
+.btn{width:100%;padding:16px;border-radius:14px;font-family:'Noto Sans TC',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .18s;border:none;letter-spacing:.03em}
+.btn-g{background:var(--green);color:#fff;box-shadow:0 4px 16px rgba(45,106,79,.28);margin-bottom:10px}
+.btn-g:disabled{background:var(--border);color:var(--muted);box-shadow:none;cursor:not-allowed}
+.btn-g:active:not(:disabled){transform:scale(.98)}
+.btn-o{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn-o:active{background:rgba(201,107,58,.06)}
+.btn-a{background:var(--amber);color:#fff;box-shadow:0 4px 16px rgba(217,119,6,.3);margin-bottom:10px}
+.btn-a:disabled{background:var(--border);color:var(--muted);box-shadow:none;cursor:not-allowed}
+.btn-a:active:not(:disabled){transform:scale(.98)}
+.btn-gold{background:var(--gold);color:#fff;box-shadow:0 4px 16px rgba(245,158,11,.35);margin-bottom:10px}
+.btn-gold:active{transform:scale(.98)}
+
+/* ── Wrong chips ── */
+.wrong-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--rbg);color:var(--red);border:1px solid rgba(181,52,26,.25);border-radius:9px;padding:5px 11px 5px 9px;font-size:.82rem;font-family:'Lora',serif;font-style:italic;cursor:pointer;transition:all .15s;user-select:none}
+.chip:active{transform:scale(.95)}
+.chip.speaking{background:#fcd5cd;font-weight:600}
+
+/* ── Success / badges ── */
+.trophy{font-size:4rem;display:block;text-align:center;margin-bottom:10px}
+.sname{font-family:'Lora',serif;font-size:1.5rem;color:var(--green);text-align:center}
+.sbadge{border-radius:16px;padding:20px;text-align:center;color:#fff;margin:14px 0}
+.sbadge.green{background:linear-gradient(135deg,#52B788,#2D6A4F)}
+.sbadge.gold{background:linear-gradient(135deg,#FCD34D,#D97706)}
+.sbadge .big{font-family:'Lora',serif;font-size:3.2rem;font-weight:600}
+.sbadge .lbl2{font-size:.78rem;opacity:.9;margin-top:2px}
+.coin-earned{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold-bg);border:2px solid var(--gold);border-radius:14px;padding:14px;margin:10px 0}
+.coin-earned .coin-ico{font-size:2rem}
+.coin-earned .coin-txt{font-size:.9rem;color:#92400E;font-weight:700;line-height:1.4}
+
+/* ── Parent confirm ── */
+.parent-box{border:2px dashed var(--border);border-radius:16px;padding:18px;text-align:center}
+.parent-box h3{font-size:.88rem;color:var(--muted);margin-bottom:4px}
+.parent-score{font-family:'Lora',serif;font-size:1.4rem;color:var(--green);margin:6px 0 12px}
+.conf-badge{background:var(--gbg);border:1px solid #B7E4C7;border-radius:12px;padding:12px;color:var(--green);font-size:.84rem;margin-top:10px}
+
+/* ── Notify row ── */
+.nrow{display:flex;align-items:center;gap:8px;padding:11px 14px;border-radius:11px;background:var(--card);border:1px solid var(--border);font-size:.8rem;color:var(--muted);margin-top:10px}
+.ndot{width:9px;height:9px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
+.ndot.sent{background:#22C55E;box-shadow:0 0 5px rgba(34,197,94,.4)}
+.ndot.fail{background:var(--red)}
+
+/* ── Stats ── */
+.stat-student{margin-bottom:16px;background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden}
+.stat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.stat-hname{font-weight:700;font-size:.92rem}
+.stat-coins{display:flex;align-items:center;gap:4px;font-size:.82rem;color:var(--gold);font-weight:700}
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0}
+.day-cell{text-align:center;padding:10px 2px;border-right:1px solid var(--border)}
+.day-cell:last-child{border-right:none}
+.day-cell.today{background:rgba(45,106,79,.06)}
+.day-name{font-size:.6rem;color:var(--muted);font-weight:700;letter-spacing:.05em;margin-bottom:5px}
+.day-count{font-family:'Lora',serif;font-size:.95rem;font-weight:600;color:var(--text)}
+.day-count.zero{color:var(--border);font-size:.8rem}
+.day-coin{font-size:.9rem;margin-top:2px}
+.stat-parent{padding:6px 16px 10px;font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);display:inline-block;flex-shrink:0}
+.pdot.ok{background:#22C55E}
+
+/* ── Notice ── */
+.notice{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:11px;font-size:.8rem;margin-bottom:12px}
+.nwarn{background:var(--abg);color:var(--amber);border:1px solid #FDE68A}
+.prev-text{font-size:.76rem;color:var(--muted);line-height:1.7;padding:8px 4px;font-style:italic}
+
+/* ── Mode badge ── */
+.mode-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:10px}
+.mode-badge.read{background:var(--gbg);color:var(--green)}
+.mode-badge.memo{background:var(--gold-bg);color:#92400E}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏺 溪郎故陶 · 英文練習</h1>
+  <div class="sub" id="dateDisplay"></div>
+  <div class="credit">By 柏宇主任</div>
+</div>
+
+<!-- ══════════ S1 首頁：選名字 + 腳本 + 模式 ══════════ -->
+<div class="screen active" id="s1">
+  <div style="height:4px"></div>
+  <div class="card">
+    <div class="lbl">✦ 今天是誰在練習？</div>
+    <div class="name-grid" id="nameGrid"></div>
+  </div>
+  <div class="card" id="scriptCard" style="display:none">
+    <div class="lbl">📋 選擇腳本</div>
+    <div class="tab-row">
+      <button class="tab-btn" id="tabR" onclick="selectScript('主題報告')">主題報告<br><span style="font-size:.65rem;opacity:.8">Innovation Project</span></button>
+      <button class="tab-btn" id="tabM" onclick="selectScript('機器人設計')">機器人設計<br><span style="font-size:.65rem;opacity:.8">Robot Design</span></button>
+    </div>
+    <div id="prevBox" class="prev-text" style="display:none"></div>
+  </div>
+  <div class="card" id="modeCard" style="display:none">
+    <div class="lbl">🎯 選擇練習模式</div>
+    <div class="mode-grid">
+      <button class="mode-btn read-mode" onclick="startMode('朗讀')">
+        <span class="ico">📖</span>
+        <div class="mtitle">朗讀練習</div>
+        <div class="msub">看著稿子念<br>適合初期練習</div>
+      </button>
+      <button class="mode-btn memo-mode" onclick="startMode('背誦')">
+        <span class="ico">🧠</span>
+        <div class="mtitle">背誦練習</div>
+        <div class="msub">不看稿自己背<br>🪙 通過得金幣</div>
+      </button>
+    </div>
+  </div>
+  <div class="notice nwarn" id="bwarn" style="display:none">⚠️ 請用 <strong>Chrome 或 Edge</strong> 才能使用語音辨識</div>
+  <div style="text-align:center;margin-top:8px">
+    <button onclick="goStats()" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;text-decoration:underline">查看本週統計 →</button>
+  </div>
+</div>
+
+<!-- ══════════ S2 朗讀練習 ══════════ -->
+<div class="screen" id="s2">
+  <div style="height:4px"></div>
+  <div class="card">
+    <div class="lbl" id="readLbl">📄 英文稿</div>
+    <div class="script-text" id="scriptDisp"></div>
+  </div>
+  <div class="card">
+    <div class="lbl">📊 即時進度</div>
+    <div class="score-row">
+      <div><div class="score-big" id="scoreNum" style="color:var(--green)">0%</div><div style="font-size:.73rem;color:var(--muted);margin-top:3px">單字正確率</div></div>
+      <div style="text-align:right"><div style="font-size:.8rem;color:var(--muted)" id="wordCnt">0 / 0</div><div style="font-size:.7rem;color:var(--muted);margin-top:2px">通過門檻 <strong id="threshLbl">55%</strong></div></div>
+    </div>
+    <div class="track"><div class="fill" id="progFill" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="lbl">🎙 辨識到的內容</div>
+    <div class="txbox" id="txBox">按下麥克風後開始朗讀…</div>
+  </div>
+  <div class="mic-area">
+    <button class="mic-btn read-mic" id="micBtn" onclick="toggleMic()">
+      <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+    </button>
+    <div class="mic-lbl" id="micLbl">點擊開始錄音<span>對著麥克風大聲、清楚地朗讀</span></div>
+  </div>
+  <button class="btn btn-a" id="stopBtn" disabled onclick="stopAndAnalyze()">⏹ 停止，查看詳細結果</button>
+  <button class="btn btn-o" onclick="goBack()">← 返回</button>
+</div>
+
+<!-- ══════════ S3 背誦練習 ══════════ -->
+<div class="screen" id="s3">
+  <div style="height:4px"></div>
+  <span class="mode-badge memo" style="margin-left:2px">🧠 背誦模式</span>
+  <div class="card">
+    <div class="lbl" id="memoLbl">📝 背誦主題</div>
+    <div class="memo-zone" id="memoZone">
+      <div class="mico">🧠</div>
+      <div class="mtxt">不看稿，直接背！</div>
+      <div class="msub2">按下麥克風後開始背誦<br>背得越多，分數越高</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl">📊 即時進度</div>
+    <div class="score-row">
+      <div><div class="score-big" id="mScoreNum" style="color:var(--amber)">0%</div><div style="font-size:.73rem;color:var(--muted);margin-top:3px">單字正確率</div></div>
+      <div style="text-align:right"><div style="font-size:.8rem;color:var(--muted)" id="mWordCnt">0 / 0</div><div style="font-size:.7rem;color:var(--muted);margin-top:2px">通過門檻 <strong id="mThreshLbl">55%</strong></div></div>
+    </div>
+    <div class="track"><div class="fill" id="mProgFill" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="lbl">🎙 你說的內容</div>
+    <div class="txbox" id="mTxBox">按下麥克風後開始背誦…</div>
+  </div>
+  <div class="mic-area">
+    <button class="mic-btn memo-mic" id="mMicBtn" onclick="toggleMemoMic()">
+      <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+    </button>
+    <div class="mic-lbl" id="mMicLbl">點擊開始背誦<span>不看稿，盡力把台詞背出來</span></div>
+  </div>
+  <button class="btn btn-gold" id="mStopBtn" disabled onclick="memoStopAndAnalyze()">⏹ 停止，查看結果</button>
+  <button class="btn btn-o" onclick="goBack()">← 返回</button>
+</div>
+
+<!-- ══════════ S4 結果分析（朗讀 & 背誦共用）══════════ -->
+<div class="screen" id="s4">
+  <div style="height:4px"></div>
+  <span class="mode-badge" id="rModeBadge">📖 朗讀</span>
+  <div class="card">
+    <div class="lbl">📊 朗讀結果</div>
+    <div class="score-row">
+      <div><div class="score-big" id="rScore">0%</div><div style="font-size:.73rem;color:var(--muted);margin-top:3px" id="rStatus"></div></div>
+      <div style="text-align:right"><div style="font-size:.8rem;color:var(--muted)" id="rWords"></div><div style="font-size:.7rem;color:var(--muted);margin-top:2px" id="rInfo"></div></div>
+    </div>
+    <div class="track"><div class="fill" id="rFill" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="lbl">🔴 需要加強的單字 <span style="font-weight:400;color:var(--muted);font-size:.65rem">（點單字可聽發音🔊）</span></div>
+    <div id="wrongDiv"></div>
+  </div>
+  <div class="card">
+    <div class="lbl" id="rScriptLbl">📄 逐字對照 · <span style="color:var(--red);font-weight:400">點紅字可聽發音</span></div>
+    <div class="script-text" id="rScript"></div>
+  </div>
+  <div style="height:6px"></div>
+  <button class="btn btn-o" style="margin-bottom:10px" id="retryBtn" onclick="retry()">🔄 再練一次</button>
+  <button class="btn btn-g" id="submitBtn" disabled onclick="doSubmit()">✓ 完成，提交成績</button>
+</div>
+
+<!-- ══════════ S5 成功 + 家長確認 ══════════ -->
+<div class="screen" id="s5">
+  <div style="height:4px"></div>
+  <div class="card">
+    <span class="trophy" id="trophyIco">🎉</span>
+    <div class="sname" id="succName"></div>
+    <div style="text-align:center;font-size:.83rem;color:var(--muted);margin-top:4px" id="succSub"></div>
+    <div class="sbadge" id="scoreBadge">
+      <div class="big" id="finalScr">--</div>
+      <div class="lbl2" id="finalType">--</div>
+    </div>
+    <div class="coin-earned" id="coinEarned" style="display:none">
+      <div class="coin-ico">🪙</div>
+      <div class="coin-txt">恭喜獲得一枚金幣！<br><span style="font-size:.75rem;font-weight:500">今天的背誦練習通過了！</span></div>
+    </div>
+    <div class="nrow"><div class="ndot" id="nDot"></div><span id="nTxt">正在發送通知…</span></div>
+  </div>
+  <div class="card">
+    <div class="lbl">👨‍👩‍👧 家長確認欄</div>
+    <div class="parent-box" id="parentBox">
+      <h3 id="parentInfo"></h3>
+      <div class="parent-score" id="parentScr"></div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:14px">家長看到結果後，請點下方確認</div>
+      <button class="btn btn-g" style="margin-bottom:0" onclick="confirmParent()">👆 已了解，我會督促孩子繼續練習</button>
+    </div>
+    <div class="conf-badge" id="confBadge" style="display:none">
+      ✅ 家長已於 <strong id="confTime"></strong> 確認督促
+    </div>
+  </div>
+  <button class="btn btn-o" onclick="resetAll()">↩ 回到首頁</button>
+</div>
+
+<!-- ══════════ S6 本週統計 ══════════ -->
+<div class="screen" id="s6">
+  <div style="height:4px"></div>
+  <div class="card" style="padding-bottom:10px">
+    <div class="lbl">📅 本週每日練習紀錄</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0;margin-bottom:8px;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <div id="weekHeader"></div>
+    </div>
+    <div style="font-size:.68rem;color:var(--muted);text-align:center;line-height:1.8;margin-top:4px">
+      🪙 = 當天背誦通過得金幣 ｜ 🟢 = 家長已確認
+    </div>
+  </div>
+  <div id="statStudents"></div>
+  <button class="btn btn-o" onclick="showSc('s1')" style="margin-top:4px">← 返回首頁</button>
+</div>
+
+<script>
+// ════════════════════════════
+//  CONFIG
+// ════════════════════════════
+const CONFIG = {
+  passingScore: 55,
+  webhookUrl: "",  // Google Apps Script 部署網址
+};
+
+// ════════════════════════════
+//  學生台詞
+// ════════════════════════════
+const SCRIPTS = {
+  "沂馨": {
+    "主題報告": `Hello judges. We are The Potter by the Stream. This is our Robot Design and Learning Journey Report, documenting our iterative design and practice process. Please take a look.
+
+This year's FLL theme, UNEARTHED, inspired us to explore the essence of archaeology. It is more than just digging; it is the systematic study of artifacts and sites to reconstruct our ancestors' lifestyles, cultures, and belief systems.
+
+Our system reconstructs the blueprint of ancient civilizations. Through technology, we bridge the gap between archaeology and the promotion of archaeological education. Then, we use it to transform the silent history into the cultural identity that people can sustainably pass down.
+
+That's all from us. Thank you for listening!`,
+
+    "機器人設計": `Hello judges. We are The Potter by the Stream. This is our Robot Design and Learning Journey Report, documenting our iterative design and practice process. Please take a look.
+
+Technology Problem-Solving Process. The core of our design follows the problem-solving process we learned in Technology class. We started with requirements analysis and task decomposition, then moved on to path planning, developing tools, and writing code. We continuously tested and debugged the problem to make sure the missions were stable.
+
+This concludes our report. Thank you for listening!`
+  },
+  "沛緁": {
+    "主題報告": `Hello judges. We are The Potter by the Stream. This is our Robot Design and Learning Journey Report, documenting our iterative design and practice process. Please take a look.
+
+Our expert interviews revealed a major technical hurdle in archaeology. Mister Huang Dong-long noted that reconstructing ancient life from pottery shards requires intense inference and imagination. However, Doctor Chu Hui-li mentioned that identification and restoration still rely on manual labor. This lack of automation makes the work not only slow but also costs too much time and hard work.
+
+Our solution is the Smart Pottery System. To solve the problems we found, we integrated three key technologies. One, Identify: We use Teachable Machine to automate pottery classification by type and chronological period. Two, Visualize: Gemini AI transforms raw data into vivid historical reconstructions. Three, Interact: A Gradio-based interface enables an engaging, hands-on educational experience.
+
+That's all from us. Thank you for listening!`,
+
+    "機器人設計": `Hello judges. We are The Potter by the Stream. This is our Robot Design and Learning Journey Report, documenting our iterative design and practice process. Please take a look.
+
+The First Run. This run completes Who Lived Here and Mineshaft Explorer.
+
+We found that the mine cart often flips over when pushed by the robot. So we developed a Detachable Locking Attachment. It firmly secures the track during transport and automatically detaches upon reaching the target. This design enhances both safety and efficiency.
+
+This concludes our report. Thank you for listening!`
+  },
+  "淞皓": {
+    "主題報告": `Pottery is a milestone of settled civilization. Beyond survival, its forms and patterns act as physical records, documenting ancient technology, migration, and social hierarchies.
+
+That's all from us. Thank you for listening!`,
+
+    "機器人設計": `I am Nobi Nobita. I learned MicroPython programming, helped write Pybricks code for the robot, and applied these programming skills to develop the pottery image recognition system in our project.
+
+This concludes our report. Thank you for listening!`
+  },
+  "沂均": {
+    "主題報告": `To ensure research rigor, we conducted literature reviews at the National Library of Public Information and performed field research at the Museum of Natural Science and the Niumatou Archaeological Site.
+
+We organized in-person scrimmages with three other teams: Lukang Senior High, Chung-Lun Junior High, and the DP Robotics Lab. During these exchanges, we shared the project goals and get the good experiences on social media. This exchange broadened our perspectives and improved our technical skills.
+
+That's all from us. Thank you for listening!`,
+
+    "機器人設計": `Innovative Programming Design. First, Automated Strategy Timer: To deal with uncertainties on the field, we made a time compensation program. If Run Six has not reached the two minute twelve second start threshold, the robot will wait automatically to ensure precise mission pacing. It also supports manual intervention, providing greater operational flexibility.
+
+Since everyone has different levels of understanding of the structure, mechanics, and programming, we divided the work based on our strengths and worked together to overcome these challenges.
+
+Communication and Sharing. We organized in-person scrimmages with three other teams: Lukang Senior High, Chung-Lun Junior High, and the DP Robotics Lab. During these exchanges, we shared the project goals and experiences on social media. This allowed us to learn different perspectives and skills.
+
+This concludes our report. Thank you for listening!`
+  },
+  "炯鎬": {
+    "主題報告": `Also, our survey shows that people don't know much about local prehistoric culture. Because of this lack of education, it is hard for people to feel proud of our cultural heritage together.
+
+That's all from us. Thank you for listening!`,
+
+    "機器人設計": `Robot Software. We coded the robot using MicroPython, which is compatible with the SPIKE robot. Unlike the original SPIKE software, text-based programming runs faster, is easier to modify and debug, and improves the robot's stability.
+
+This concludes our report. Thank you for listening!`
+  },
+  "琲霓": {
+    "主題報告": `Based on our research, we found three core problems.
+
+First, imagination comes with subjective limitations.
+
+Second, over-reliance on manual skills creates a maintenance bottleneck.
+
+The last, reflecting on gaps in archaeological education through modern research.
+
+Here is how our system works in three steps. Capture and Identify: The camera captures a live image, and our Teachable Machine model identifies the pottery in real time. Process and Generate: Based on user selected characters and scenes, n8n triggers the Gemini API to generate a historical reconstruction image or video. Display and Experience: Finally, the Gradio interface seamlessly presents the identification results alongside the immersive AI generated content.
+
+That's all from us. Thank you for listening!`,
+
+    "機器人設計": `Team Participation in Robot Design. I am Dorami. Using Studio, I learned 3D modeling skills, which allowed me to verify structural feasibility before physical assembly.
+
+This concludes our report. Thank you for listening!`
+  },
+  "信恩": {
+    "主題報告": `We realized that manual restoration relies on an archaeologist's visual imagination. To many archaeologists, it becomes a pressure when they face thousands of shards. By applying skills from our IT classes, including Teachable Machine, n8n, and AI, we developed a solution called Pottery Time Machine: The Past in Sight.
+
+Our hardware evolved through three improvements. We started with a LEGO structure. However, it is relatively open and easily affected by ambient light. The second version is to use opaque PP boards, but it was too dark for the camera to capture images clearly. Our final design uses an acrylic enclosure with internal LED strips in order to ensure a stable and well-lit environment for accurate recognition.
+
+That's all from us. Thank you for listening!`,
+
+    "機器人設計": `Error Correction. Problem One: During the Angler Artifacts mission, we first used gears. However, the backlash prevented the flag from lowering completely. We switched to a direct drive friction mechanism using tires to eliminate this error. Before the change, it failed eight out of ten times. After the change, the success rate improved to one hundred percent.
+
+Problem Two: During the fifth run, Careful Recovery, the success rate was low due to inconsistent turning radius. We added positioning rollers to the side of the attachment. By wall squaring, we use physical calibration to improve stability. Before the change, it failed eight out of ten times. After the change, it was successful every time.
+
+This concludes our report. Thank you for listening!`
+  },
+  "書賢": {
+    "主題報告": null,
+    "機器人設計": `Strategy Planning. Our strategy is to complete the field tasks in six runs. We plan the routes to prevent the robot from moving in repeated paths, which helps save time. Given current time constraints, we will focus on the most critical runs.
+
+This concludes our report. Thank you for listening!`
+  },
+  "宥叡": {
+    "主題報告": null,
+    "機器人設計": `The Third Run. This run completes Tip the Scales, Angler Artifacts, Statue Rebuild, and Forum.
+
+This concludes our report. Thank you for listening!`
+  },
+  "昕紘": {
+    "主題報告": null,
+    "機器人設計": `To retrieve objects from Tip the Scales, we used the Lever Principle to design a passive attachment. When the bar pushes against the object, the high friction of the tire lifts the lid. This Structure over Motor reduces angle errors caused by DC motors.
+
+Second, Gyro PD Line Following: To ensure straight line precision, we implemented a PD control algorithm. By using the Gyro sensor to detect heading errors, the robot calculates real time corrections. Combined with smooth acceleration and deceleration curves, the robot remains stable even at high speeds.
+
+This concludes our report. Thank you for listening!`
+  }
+};
+
+// ════════════════════════════
+//  State
+// ════════════════════════════
+const DAY_NAMES = ["日","一","二","三","四","五","六"];
+let curName="", curType="", curMode=""; // 朗讀 or 背誦
+let recording=false, mRecording=false;
+let fullTx="", interimTx="", mFullTx="", mInterimTx="";
+let recog=null, mRecog=null, hasSR=false;
+let wordEls=[], tokens=[];
+let curScore=0, matched=0;
+let lastData=null;
+
+// ════════════════════════════
+//  Init
+// ════════════════════════════
+function init(){
+  const now=new Date();
+  document.getElementById("dateDisplay").textContent=
+    now.toLocaleDateString("zh-TW",{year:"numeric",month:"long",day:"numeric",weekday:"long"});
+  document.getElementById("threshLbl").textContent=CONFIG.passingScore+"%";
+  document.getElementById("mThreshLbl").textContent=CONFIG.passingScore+"%";
+  hasSR=('webkitSpeechRecognition' in window)||('SpeechRecognition' in window);
+  if(!hasSR) document.getElementById("bwarn").style.display="flex";
+  if(window.speechSynthesis) window.speechSynthesis.getVoices();
+  buildNameGrid();
+}
+
+function buildNameGrid(){
+  const grid=document.getElementById("nameGrid");
+  Object.keys(SCRIPTS).forEach(n=>{
+    const b=document.createElement("button");
+    b.className="name-btn"; b.textContent=n;
+    b.onclick=()=>pickName(n); grid.appendChild(b);
+  });
+}
+
+function pickName(n){
+  curName=n; curType="";
+  document.querySelectorAll(".name-btn").forEach(b=>b.classList.toggle("sel",b.textContent===n));
+  const sc=SCRIPTS[n];
+  document.getElementById("tabR").disabled=!sc["主題報告"];
+  document.getElementById("tabM").disabled=!sc["機器人設計"];
+  ["tabR","tabM"].forEach(id=>document.getElementById(id).classList.remove("on"));
+  document.getElementById("prevBox").style.display="none";
+  document.getElementById("scriptCard").style.display="block";
+  document.getElementById("modeCard").style.display="none";
+}
+
+function selectScript(type){
+  if(!SCRIPTS[curName][type]) return;
+  curType=type;
+  document.getElementById("tabR").classList.toggle("on",type==="主題報告");
+  document.getElementById("tabM").classList.toggle("on",type==="機器人設計");
+  const txt=SCRIPTS[curName][type];
+  const prev=document.getElementById("prevBox");
+  prev.style.display="block";
+  prev.textContent=txt.length>120?txt.substring(0,120)+"…":txt;
+  document.getElementById("modeCard").style.display="block";
+}
+
+function showSc(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0,0);
+}
+
+function goStats(){ renderStats(); showSc("s6"); }
+
+// ════════════════════════════
+//  Start mode
+// ════════════════════════════
+function startMode(mode){
+  curMode=mode;
+  if(mode==="朗讀") initReading();
+  else initMemo();
+}
+
+// ════════════════════════════
+//  READING MODE
+// ════════════════════════════
+function initReading(){
+  fullTx=""; interimTx=""; curScore=0; matched=0; recording=false;
+  document.getElementById("readLbl").textContent=`📄 ${curName}的台詞 · ${curType}`;
+  tokens=tokenize(SCRIPTS[curName][curType]);
+  renderScriptTo("scriptDisp");
+  setScore("scoreNum","progFill","wordCnt",0,0);
+  document.getElementById("txBox").textContent="按下麥克風後開始朗讀…";
+  document.getElementById("txBox").classList.remove("live");
+  document.getElementById("micBtn").classList.remove("on");
+  document.getElementById("micLbl").innerHTML='點擊開始錄音<span>對著麥克風大聲、清楚地朗讀</span>';
+  document.getElementById("stopBtn").disabled=true;
+  setupSR("read"); showSc("s2");
+}
+
+function setupSR(mode){
+  if(!hasSR) return;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(mode==="read"){
+    recog=new SR(); recog.lang="en-US"; recog.continuous=true; recog.interimResults=true;
+    recog.onresult=e=>{
+      let nf=""; interimTx="";
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const t=e.results[i][0].transcript;
+        if(e.results[i].isFinal) nf+=t+" "; else interimTx+=t;
+      }
+      if(nf) fullTx+=nf;
+      document.getElementById("txBox").textContent=(fullTx+interimTx).trim()||"聆聽中…";
+      calcScore(fullTx+" "+interimTx,false,"scoreNum","progFill","wordCnt");
+    };
+    recog.onerror=e=>{if(e.error!=='no-speech')console.warn(e.error);};
+    recog.onend=()=>{if(recording){try{recog.start();}catch(e){}}};
+  } else {
+    mRecog=new SR(); mRecog.lang="en-US"; mRecog.continuous=true; mRecog.interimResults=true;
+    mRecog.onresult=e=>{
+      let nf=""; mInterimTx="";
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const t=e.results[i][0].transcript;
+        if(e.results[i].isFinal) nf+=t+" "; else mInterimTx+=t;
+      }
+      if(nf) mFullTx+=nf;
+      document.getElementById("mTxBox").textContent=(mFullTx+mInterimTx).trim()||"聆聽中…";
+      calcScore(mFullTx+" "+mInterimTx,false,"mScoreNum","mProgFill","mWordCnt");
+    };
+    mRecog.onerror=e=>{if(e.error!=='no-speech')console.warn(e.error);};
+    mRecog.onend=()=>{if(mRecording){try{mRecog.start();}catch(e){}}};
+  }
+}
+
+function toggleMic(){
+  if(!hasSR){alert("請使用 Chrome 或 Edge");return;}
+  if(recording) pauseMic(); else startMic();
+}
+function startMic(){
+  recording=true; try{recog.start();}catch(e){}
+  document.getElementById("micBtn").classList.add("on");
+  document.getElementById("micLbl").innerHTML='錄音中 · 再按暫停<span>請大聲、清楚朗讀</span>';
+  document.getElementById("txBox").classList.add("live");
+  document.getElementById("stopBtn").disabled=false;
+}
+function pauseMic(){
+  recording=false; try{recog.stop();}catch(e){}
+  document.getElementById("micBtn").classList.remove("on");
+  document.getElementById("micLbl").innerHTML='點擊繼續錄音<span>可補讀遺漏的部分</span>';
+}
+
+// ════════════════════════════
+//  MEMO MODE
+// ════════════════════════════
+function initMemo(){
+  mFullTx=""; mInterimTx=""; curScore=0; matched=0; mRecording=false;
+  document.getElementById("memoLbl").textContent=`🧠 ${curName}的台詞 · ${curType}`;
+  tokens=tokenize(SCRIPTS[curName][curType]);
+  // Build wordEls from tokens but don't show script
+  wordEls=[];
+  let wi=0;
+  tokens.forEach(tok=>{
+    if(/[a-zA-Z]/.test(tok)){
+      wordEls.push({id:"w"+wi++,clean:tok.toLowerCase().replace(/[^a-z]/g,""),raw:tok});
+    }
+  });
+  setScore("mScoreNum","mProgFill","mWordCnt",0,0);
+  document.getElementById("mTxBox").textContent="按下麥克風後開始背誦…";
+  document.getElementById("mTxBox").classList.remove("live");
+  document.getElementById("mMicBtn").classList.remove("on");
+  document.getElementById("mMicLbl").innerHTML='點擊開始背誦<span>不看稿，把台詞背出來</span>';
+  document.getElementById("mStopBtn").disabled=true;
+  setupSR("memo"); showSc("s3");
+}
+
+function toggleMemoMic(){
+  if(!hasSR){alert("請使用 Chrome 或 Edge");return;}
+  if(mRecording) pauseMemoMic(); else startMemoMic();
+}
+function startMemoMic(){
+  mRecording=true; try{mRecog.start();}catch(e){}
+  document.getElementById("mMicBtn").classList.add("on");
+  document.getElementById("mMicLbl").innerHTML='背誦中 · 再按暫停<span>盡力把台詞背出來</span>';
+  document.getElementById("mTxBox").classList.add("live");
+  document.getElementById("mStopBtn").disabled=false;
+}
+function pauseMemoMic(){
+  mRecording=false; try{mRecog.stop();}catch(e){}
+  document.getElementById("mMicBtn").classList.remove("on");
+  document.getElementById("mMicLbl").innerHTML='點擊繼續背誦<span>可以繼續補充</span>';
+}
+
+// ════════════════════════════
+//  Tokenize + render
+// ════════════════════════════
+function tokenize(txt){return txt.match(/[a-zA-Z']+|[^a-zA-Z'\s]+|\s+|\n/g)||[];}
+
+function renderScriptTo(id){
+  wordEls=[];
+  let wi=0;
+  document.getElementById(id).innerHTML=tokens.map(tok=>{
+    if(/[a-zA-Z]/.test(tok)){
+      const eid="w"+wi++;
+      wordEls.push({id:eid,clean:tok.toLowerCase().replace(/[^a-z]/g,""),raw:tok});
+      return `<span class="word" id="${eid}">${tok}</span>`;
+    } else if(tok==="\n") return "<br>";
+    else return tok;
+  }).join("");
+}
+
+// ════════════════════════════
+//  Score calculation
+// ════════════════════════════
+function calcScore(spokenTxt,final,numId,fillId,cntId){
+  const spoken=new Set(spokenTxt.toLowerCase().replace(/[^a-z '\s]/g,"").split(/\s+/).filter(Boolean));
+  let m=0;
+  wordEls.forEach(w=>{
+    const el=document.getElementById(w.id);
+    const hit=w.clean&&spoken.has(w.clean);
+    if(el) el.className="word"+(final?(hit?" hit":" miss"):(hit?" hit":""));
+    if(hit) m++;
+  });
+  matched=m;
+  const pct=wordEls.length?Math.round(m/wordEls.length*100):0;
+  curScore=pct;
+  setScore(numId,fillId,cntId,pct,m);
+}
+
+function setScore(numId,fillId,cntId,pct,m){
+  document.getElementById(numId).textContent=pct+"%";
+  document.getElementById(fillId).style.width=pct+"%";
+  document.getElementById(cntId).textContent=(m||0)+" / "+wordEls.length+" 字";
+}
+
+// ════════════════════════════
+//  Stop & analyze
+// ════════════════════════════
+function stopAndAnalyze(){
+  if(recording) pauseMic();
+  calcScore(fullTx,true,"scoreNum","progFill","wordCnt");
+  buildResultScreen(fullTx,"朗讀");
+  showSc("s4");
+}
+
+function memoStopAndAnalyze(){
+  if(mRecording) pauseMemoMic();
+  // For memo: do final calc, then render the full script with highlights
+  const spoken=new Set((mFullTx).toLowerCase().replace(/[^a-z '\s]/g,"").split(/\s+/).filter(Boolean));
+  let m=0;
+  wordEls.forEach(w=>{w.hit=w.clean&&spoken.has(w.clean);if(w.hit)m++;});
+  matched=m;
+  const pct=wordEls.length?Math.round(m/wordEls.length*100):0;
+  curScore=pct;
+  setScore("mScoreNum","mProgFill","mWordCnt",pct,m);
+  buildResultScreen(mFullTx,"背誦");
+  showSc("s4");
+}
+
+function buildResultScreen(spokenTxt, mode){
+  const pct=curScore, pass=pct>=CONFIG.passingScore;
+  // Mode badge
+  const badge=document.getElementById("rModeBadge");
+  badge.className="mode-badge "+(mode==="朗讀"?"read":"memo");
+  badge.textContent=mode==="朗讀"?"📖 朗讀練習":"🧠 背誦練習";
+  // Score
+  document.getElementById("rScore").textContent=pct+"%";
+  document.getElementById("rScore").style.color=pass?"var(--green)":"var(--red)";
+  document.getElementById("rStatus").textContent=pass?"✅ 通過！":"📝 已練習（未達通過門檻）";
+  document.getElementById("rWords").textContent=matched+" / "+wordEls.length+" 字";
+  document.getElementById("rInfo").textContent=curName+" · "+curType;
+  document.getElementById("rFill").style.width=pct+"%";
+  document.getElementById("rScriptLbl").innerHTML=
+    mode==="背誦"?"📄 對照原文 · <span style='color:var(--red);font-weight:400'>紅字=你沒背到，點可聽發音</span>"
+                  :"📄 逐字對照 · <span style='color:var(--red);font-weight:400'>點紅字可聽發音</span>";
+  // Render script with highlights
+  const spoken=new Set(spokenTxt.toLowerCase().replace(/[^a-z '\s]/g,"").split(/\s+/).filter(Boolean));
+  let wi2=0;
+  const html=tokens.map(tok=>{
+    if(/[a-zA-Z]/.test(tok)){
+      const clean=tok.toLowerCase().replace(/[^a-z]/g,"");
+      const hit=clean&&spoken.has(clean);
+      const id2="r"+wi2++;
+      return `<span class="word ${hit?"hit":"miss"}" id="${id2}" onclick="speakWord('${tok.replace(/'/g,"\\'")}')">  ${tok}</span>`;
+    } else if(tok==="\n") return "<br>";
+    else return tok;
+  }).join("");
+  document.getElementById("rScript").innerHTML=html;
+  // Wrong chips
+  const missed=[...new Set(tokens.filter(t=>/[a-zA-Z]/.test(t)&&!spoken.has(t.toLowerCase().replace(/[^a-z]/g,"")))
+    .map(t=>t))];
+  const wd=document.getElementById("wrongDiv");
+  if(missed.length===0){
+    wd.innerHTML='<div style="font-size:.83rem;color:var(--green)">🎉 所有單字都背到了！</div>';
+  } else {
+    wd.innerHTML=`<div style="font-size:.76rem;color:var(--muted);margin-bottom:10px">共 ${missed.length} 個單字需加強：</div>`+
+      `<div class="wrong-chips">${missed.map(w=>`<span class="chip" onclick="speakWord('${w.replace(/'/g,"\\'")}');highlightChip(this)">${w} <span style="opacity:.65;font-size:.75rem">🔊</span></span>`).join("")}</div>`;
+  }
+  document.getElementById("retryBtn").textContent=mode==="背誦"?"🔄 再背一次":"🔄 再練一次";
+  // 有練就可以提交，不強制通過
+  document.getElementById("submitBtn").disabled=false;
+}
+
+function speakWord(word){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(word);
+  u.lang="en-US"; u.rate=0.82;
+  const voices=window.speechSynthesis.getVoices();
+  const v=voices.find(v=>v.lang.startsWith("en")&&v.localService)||voices.find(v=>v.lang.startsWith("en"));
+  if(v) u.voice=v;
+  window.speechSynthesis.speak(u);
+}
+
+function highlightChip(el){
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("speaking"));
+  el.classList.add("speaking");
+  setTimeout(()=>el.classList.remove("speaking"),1400);
+}
+
+function retry(){
+  if(curMode==="朗讀") initReading();
+  else initMemo();
+}
+
+function goBack(){
+  if(recording){pauseMic();if(recog)try{recog.abort();}catch(e){}}
+  if(mRecording){pauseMemoMic();if(mRecog)try{mRecog.abort();}catch(e){}}
+  showSc("s1");
+}
+
+// ════════════════════════════
+//  Submit
+// ════════════════════════════
+async function doSubmit(){
+  const pct=curScore, isMemo=curMode==="背誦";
+  // Check if coin earned (memo + pass + not already earned today)
+  const coinEarned=isMemo&&pct>=CONFIG.passingScore&&!alreadyEarnedCoinToday(curName,curType);
+  document.getElementById("trophyIco").textContent=pct>=80?"🏆":pct>=60?"🎉":"💪";
+  document.getElementById("succName").textContent=curName+"，"+(pct>=80?"非常優秀！":pct>=55?"完成！繼續加油！":"棒！再多練幾次！");
+  document.getElementById("succSub").textContent=curMode+"練習 · "+curType+" · "+new Date().toLocaleDateString("zh-TW",{month:"long",day:"numeric"});
+  const badge=document.getElementById("scoreBadge");
+  badge.className="sbadge "+(isMemo?"gold":"green");
+  document.getElementById("finalScr").textContent=pct+"%";
+  document.getElementById("finalType").textContent=curType+" · "+curMode+"練習";
+  document.getElementById("coinEarned").style.display=coinEarned?"flex":"none";
+  document.getElementById("parentInfo").textContent=curName+"的練習結果";
+  document.getElementById("parentScr").textContent=pct+"% · "+(pct>=CONFIG.passingScore?"通過 ✓":"已練習")+(coinEarned?" 🪙":"");
+  document.getElementById("parentBox").style.display="block";
+  document.getElementById("confBadge").style.display="none";
+  document.getElementById("nDot").className="ndot";
+  document.getElementById("nTxt").textContent="正在發送通知…";
+  showSc("s5");
+  const data={
+    student:curName, scriptType:curType, mode:curMode, score:pct,
+    passed:pct>=CONFIG.passingScore, coinEarned,
+    date:new Date().toLocaleDateString("zh-TW"),
+    time:new Date().toLocaleTimeString("zh-TW"),
+    timestamp:new Date().toISOString(),
+    parentConfirmed:false
+  };
+  lastData=data; saveRec(data); await sendHook(data);
+}
+
+// ════════════════════════════
+//  Parent confirmation
+// ════════════════════════════
+function confirmParent(){
+  const now=new Date();
+  const ts=now.toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("parentBox").style.display="none";
+  document.getElementById("confBadge").style.display="block";
+  document.getElementById("confTime").textContent=ts;
+  if(lastData){
+    lastData.parentConfirmed=true; lastData.parentConfirmTime=now.toISOString();
+    updateParent(lastData);
+    sendHook({...lastData,action:"parentConfirmed"});
+  }
+}
+
+// ════════════════════════════
+//  Storage
+// ════════════════════════════
+function saveRec(d){
+  let a=loadRecs(); a.push(d);
+  if(a.length>2000) a=a.slice(-2000);
+  try{localStorage.setItem("fll2025",JSON.stringify(a));}catch(e){}
+}
+function updateParent(d){
+  let a=loadRecs();
+  const i=a.findIndex(r=>r.timestamp===d.timestamp);
+  if(i>=0){a[i].parentConfirmed=true;a[i].parentConfirmTime=d.parentConfirmTime;}
+  try{localStorage.setItem("fll2025",JSON.stringify(a));}catch(e){}
+}
+function loadRecs(){
+  try{return JSON.parse(localStorage.getItem("fll2025")||"[]");}catch(e){return[];}
+}
+
+function alreadyEarnedCoinToday(name,type){
+  const today=new Date().toLocaleDateString("zh-TW");
+  return loadRecs().some(r=>r.student===name&&r.scriptType===type&&r.mode==="背誦"&&r.passed&&r.coinEarned&&r.date===today);
+}
+
+function getMondayOfWeek(d){
+  const dow=d.getDay();
+  const mon=new Date(d);
+  mon.setDate(d.getDate()-(dow===0?6:dow-1));
+  mon.setHours(0,0,0,0);
+  return mon;
+}
+
+// ════════════════════════════
+//  Stats render
+// ════════════════════════════
+function renderStats(){
+  const now=new Date();
+  const monday=getMondayOfWeek(now);
+  // Build 7 days
+  const days=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(monday); d.setDate(monday.getDate()+i);
+    days.push(d);
+  }
+  const recs=loadRecs().filter(r=>{const d=new Date(r.timestamp);return d>=monday;});
+
+  // Week header
+  const todayStr=now.toLocaleDateString("zh-TW");
+  document.getElementById("weekHeader").outerHTML=`<div id="weekHeader" style="display:contents">${
+    days.map((d,i)=>{
+      const isToday=d.toLocaleDateString("zh-TW")===todayStr;
+      return `<div style="text-align:center;padding:8px 2px;border-right:${i<6?"1px solid var(--border)":"none"};background:${isToday?"rgba(45,106,79,.06)":"transparent"}">
+        <div style="font-size:.6rem;font-weight:700;color:var(--muted);letter-spacing:.05em">週${DAY_NAMES[d.getDay()]}</div>
+        <div style="font-size:.75rem;color:${isToday?"var(--green)":"var(--text)"};font-weight:${isToday?"700":"400"};margin-top:2px">${d.getMonth()+1}/${d.getDate()}</div>
+      </div>`;
+    }).join("")
+  }</div>`;
+
+  // Per student
+  const container=document.getElementById("statStudents");
+  container.innerHTML="";
+  Object.keys(SCRIPTS).forEach(sname=>{
+    const sRecs=recs.filter(r=>r.student===sname);
+    const parentOk=sRecs.some(r=>r.parentConfirmed);
+    let totalCoins=0;
+    const dayCells=days.map((d,i)=>{
+      const dStr=d.toLocaleDateString("zh-TW");
+      const dayRecs=sRecs.filter(r=>r.date===dStr);
+      const count=dayRecs.length;
+      const coins=dayRecs.filter(r=>r.coinEarned).length;
+      if(coins>0) totalCoins+=coins;
+      const isToday=dStr===todayStr;
+      return `<div class="day-cell${isToday?" today":""}" style="border-right:${i<6?"1px solid var(--border)":"none"}">
+        <div class="day-name">週${DAY_NAMES[d.getDay()]}</div>
+        <div class="day-count${count===0?" zero":""}">${count===0?"—":count}</div>
+        <div class="day-coin">${coins>0?"🪙":""}</div>
+      </div>`;
+    });
+    container.innerHTML+=`
+    <div class="stat-student">
+      <div class="stat-head">
+        <div class="stat-hname">${sname}</div>
+        <div class="stat-coins">${totalCoins>0?`🪙 × ${totalCoins}`:""}</div>
+      </div>
+      <div class="day-grid">${dayCells.join("")}</div>
+      <div class="stat-parent">
+        <span class="pdot ${parentOk?"ok":""}"></span>
+        ${parentOk?"家長已確認督促":"家長尚未確認"}
+      </div>
+    </div>`;
+  });
+}
+
+// ════════════════════════════
+//  Webhook → LINE
+// ════════════════════════════
+async function sendHook(data){
+  const dot=document.getElementById("nDot"), txt=document.getElementById("nTxt");
+  if(!CONFIG.webhookUrl){dot.className="ndot";txt.textContent="（未設定通知，本機已記錄）";return;}
+  try{
+    await fetch(CONFIG.webhookUrl,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    dot.className="ndot sent"; txt.textContent="✓ 老師已收到 LINE 通知！";
+  }catch(e){dot.className="ndot fail";txt.textContent="⚠️ 通知失敗，請截圖給老師";}
+}
+
+function resetAll(){
+  curName=""; curType=""; curMode="";
+  document.querySelectorAll(".name-btn").forEach(b=>b.classList.remove("sel"));
+  document.getElementById("scriptCard").style.display="none";
+  document.getElementById("modeCard").style.display="none";
+  if(recog)try{recog.abort();}catch(e){}
+  if(mRecog)try{mRecog.abort();}catch(e){}
+  recording=false; mRecording=false;
+  showSc("s1");
+}
+
+init();
+</script>
+</body>
+</html>
